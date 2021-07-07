@@ -1,4 +1,4 @@
-// Author:
+// Author: Aaron Hobson
 
 // Global UI Variables
 let canvasDiv;
@@ -26,6 +26,9 @@ let downs;
 let lefts;
 let rights;
 let centers;
+let ballX;
+let ballY;
+let ballSpeed;
 
 function setup() {
   canvasDiv = createDiv();
@@ -43,7 +46,11 @@ function setup() {
   rights = 0;
   centers = 0;
   // new code below
-
+  ballX = width / 2;
+  ballY = height / 2;
+  ballSpeed = 5;
+  video = createCapture(VIDEO, videoReady);
+  video.parent(canvasDiv);
 }
 
 function draw() {
@@ -52,7 +59,8 @@ function draw() {
     if(knnClassifier.getNumLabels() > 0) {
       knnClassifier.classify(imgFeatures, gotResults);
       // new code below
-
+      background(255);
+      drawBall();
     }
   }
 }
@@ -127,14 +135,20 @@ function buildButtons() {
 }
 
 function videoReady() {
-  video.style("display", "none");
+  //video.style("display", "none");
   // new code below
-
+  video.style("transform", "scale(-1, 1)");
   featureExtractor = ml5.featureExtractor("MobileNet", featureExtractorLoaded);
 }
 
 function featureExtractorLoaded() {
-
+  knnClassifier = ml5.KNNClassifier();
+  knnClassifier.load("model/myKNN.json", function() {
+    isModelReady = true;
+    textP.html("Begin posing and adding data!");
+    buttonDiv.style("display", "block");
+    buttonDiv2.style("display", "block");
+  });
 }
 
 function gotResults(error, results) {
